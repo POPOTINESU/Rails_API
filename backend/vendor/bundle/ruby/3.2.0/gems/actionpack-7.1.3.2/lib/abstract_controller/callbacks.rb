@@ -33,7 +33,6 @@ module AbstractController
       define_callbacks :process_action,
                        terminator: ->(controller, result_lambda) { result_lambda.call; controller.performed? },
                        skip_after_callbacks_if_terminated: true
-      mattr_accessor :raise_on_missing_callback_actions, default: false
     end
 
     class ActionFilter # :nodoc:
@@ -43,25 +42,7 @@ module AbstractController
         @actions = Array(actions).map(&:to_s).to_set
       end
 
-      def match?(controller)
-        if controller.raise_on_missing_callback_actions
-          missing_action = @actions.find { |action| !controller.available_action?(action) }
-          if missing_action
-            filter_names = @filters.length == 1 ? @filters.first.inspect : @filters.inspect
 
-            message = <<~MSG
-              The #{missing_action} action could not be found for the #{filter_names}
-              callback on #{controller.class.name}, but it is listed in the controller's
-              #{@conditional_key.inspect} option.
-
-              Raising for missing callback actions is a new default in Rails 7.1, if you'd
-              like to turn this off you can delete the option from the environment configurations
-              or set `config.action_controller.raise_on_missing_callback_actions` to `false`.
-            MSG
-
-            raise ActionNotFound.new(message, controller, missing_action)
-          end
-        end
 
         @actions.include?(controller.action_name)
       end
@@ -260,4 +241,3 @@ module AbstractController
         end
       end
   end
-end

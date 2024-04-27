@@ -425,7 +425,6 @@
 
     ```ruby
     # config/environments/production.rb
-    config.action_controller.raise_on_missing_callback_actions = false
     ```
 
     *Jess Bees*
